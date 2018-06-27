@@ -1,0 +1,38 @@
+Error handling in swift
+
+Optional return type:
+If Value Does Not Exist, return nil
+
+
+Marking functions with `throws`
+
+Every call to a throwing function needs `try`,
+
+If error occurs, two options
+    Handle with do/catch
+    Propagate up by marking calling function as `throws`
+
+`throw` is treated as a regular `return` by the compiler
+
+try -> handle error or pass on to caller
+
+try? -> return nil if fails, discards error info
+
+try! -> force-unwrap, app crashes if error occurs 
+
+
+Structs
+
+enum IntParsingError: Error {
+    case: overflow
+}
+
+-(NSString*)contentsOfFile(NSString*)filename error:(NSError*)error; 
+vs
+func contents(ofFile filename: String) throws -> Error String 
+
+throw vs reThrow
+
+reThrow is for closures
+
+good example is map function on collection

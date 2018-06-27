@@ -10,6 +10,7 @@ import UIKit
 import AVKit
 import NotificationCenter
 import Photos
+import CoreData
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -24,7 +25,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var bottomText: UITextField!
     
     var textFields = [UITextField]()
-    
+    private var fetchedRC: NSFetchedResultsController<Meme>!
     private var memes = [Meme]()
     
     private var appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -102,6 +103,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         saveButton.isEnabled = false
         setupTextFields()
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
+        MemeClass.getCoreData(appDelegate: appDelegate, viewContext: context)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -195,12 +197,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             activityViewController.completionWithItemsHandler = { activity, success, items, error in
                 if success {
                     if activity?.rawValue == "com.apple.UIKit.activity.SaveToCameraRoll" {
-                        guard let originalImageData = UIImagePNGRepresentation(originalImage) as Data?
+                        guard let originalImageData = UIImagePNGRepresentation(originalImage) as NSData?
                             else {
                             print("error when converting original image data")
                             return
                         }
-                        guard let memedImageData = UIImagePNGRepresentation(memedImage) as Data?
+                        guard let memedImageData = UIImagePNGRepresentation(memedImage) as NSData?
                             else {
                             print("error when converting memed image data")
                             return
@@ -212,7 +214,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                         meme.originalImage = originalImageData
                         meme.memedImage = memedImageData
                         self.appDelegate.saveContext()
-                        self.memes.append(meme)
+                        MemeClass.add(meme: meme)
                         self.imageView.image = nil
                         self.saveButton.isEnabled = false
                         self.topText.text = self.topText.placeholder
